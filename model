@@ -1,0 +1,126 @@
+
+import torch
+import torch.nn as nn
+from torchvision import models, transforms
+from PIL import Image
+import streamlit as st
+
+CLASS_NAMES = [
+    'Speed limit (20km/h)', 'Speed limit (30km/h)', 'No vehicles', 'Right-of-way at the next intersection',
+    'Priority road', 'Yield', 'Stop', 'No passing for vehicles over 3.5 metric tons',
+    'vehicles over 3.5 metric tons prohibited', 'No entry', 'General caution',
+    'Dangerous curve to the left', 'Speed limit (50km/h)', 'Dangerous curve to the right', 'Double curve', 'Bumpy road',
+    'Slippery road', 'Road narrows on the right', 'Road work', 'Traffic signals',
+    'Pedestrians', 'Children crossing', 'Bicycles crossing', 'Speed limit (60km/h)',
+    'Beware of ice/snow', 'Wild animals crossing', 'End of all speed and passing limits', 'Turn right ahead', 'Turn left ahead',
+    'Ahead only', 'Go straight or right', 'Go straight or left', 'Keep right',
+    'Keep left', 'Speed limit (70km/h)', 'Roundabout mandatory', 'End of no passing', 'End of no passing by vehicles over 3.5 metric tons',
+    'speed limit (80km/h)', 'end of Speed limit (80km/h)', 'Speed limit (100km/h)', 'Speed limit (120km/h)',
+    'No passing'
+]
+
+
+@st.cache_resource
+def load_model():
+    """
+    Load the trained ResNet-18 model for traffic sign recognition
+    
+    Returns:
+        torch.nn.Module: Loaded model ready for inference
+    """
+    try:
+        # Initialize ResNet-18 architecture
+        model = models.resnet18(pretrained=False)
+        num_ftrs = model.fc.in_features
+        
+        # Replace final layer for 43 traffic sign classes
+        model.fc = nn.Sequential(nn.Linear(num_ftrs, 43))
+        
+        # Load trained weights
+        model.load_state_dict(torch.load('./traffic_sign_model.pth', map_location='cpu'))
+        model.eval()
+        
+        return model
+    except Exception as e:
+        st.error(f" Error loading model: {str(e)}")
+        return None
+
+
+def get_image_transforms():
+    """
+    Get image preprocessing transforms
+    
+    Returns:
+        torchvision.transforms.Compose: Preprocessing pipeline
+    """
+    return transforms.Compose([
+        transforms.Resize(size=(256, 256), interpolation=transforms.InterpolationMode.BILINEAR),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize(
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225]
+        )
+    ])
+
+
+def preprocess_image(image):
+    """
+    Preprocess image for model prediction
+    
+    Args:
+        image (PIL.Image): Input image
+        
+    Returns:
+        torch.Tensor: Preprocessed image tensor
+    """
+    transform = get_image_transforms()
+    
+    # Convert to RGB if necessary
+    if image.mode != 'RGB':
+        image = image.convert('RGB')
+    
+    # Apply transformations and add batch dimension
+    image_tensor = transform(image).unsqueeze(0)
+    return image_tensor
+
+
+def predict(model, image_tensor):
+    """
+    Make prediction with confidence scores
+    
+    Args:
+        model (torch.nn.Module): Trained model
+        image_tensor (torch.Tensor): Preprocessed image
+        
+    Returns:
+        tuple: (predicted_class_index, confidence_score, all_probabilities)
+    """
+    with torch.no_grad():
+        outputs = model(image_tensor)
+        probabilities = torch.nn.functional.softmax(outputs[0], dim=0)
+        confidence, predicted = torch.max(probabilities, 0)
+        
+    return predicted.item(), confidence.item(), probabilities
+
+
+def get_top_predictions(probabilities, top_k=3):
+    """
+    Get top-k predictions with probabilities
+    
+    Args:
+        probabilities (torch.Tensor): All class probabilities
+        top_k (int): Number of top predictions to return
+        
+    Returns:
+        list: List of tuples (class_name, probability)
+    """
+    top_k_results = torch.topk(probabilities, top_k)
+    
+    predictions = []
+    for prob, idx in zip(top_k_results.values, top_k_results.indices):
+        class_name = CLASS_NAMES[idx.item()]
+        probability = prob.item()
+        predictions.append((class_name, probability))
+    
+    return predictions
