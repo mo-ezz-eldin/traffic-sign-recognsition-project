@@ -165,14 +165,6 @@ torch>=1.13.0
 torchvision>=0.14.0
 Pillow>=9.0.0
 numpy>=1.21.0
-📝 License
-This project is licensed under the MIT License - see the LICENSE file for details.
-👨‍💻 Author
-Your Name
-
-GitHub: @yourusername
-LinkedIn: Your LinkedIn
-Email: your.email@example.com
 
 🙏 Acknowledgments
 
