@@ -8,36 +8,32 @@ Real-time Prediction: Instant traffic sign recognition
 Beautiful UI: Modern, responsive web interface with glassmorphism design
 43 Sign Types: Comprehensive coverage of traffic signs
 Confidence Scores: Detailed prediction confidence with top-3 results
-Easy to Use: Simple drag-and-drop image upload
+Easy to Use: Simple drag-and-drop image upload.
 
 🚀 Quick Start
 Prerequisites
-bashPython 3.8+
+
+Python 3.8+
 PyTorch
 Streamlit
 PIL (Pillow)
 NumPy
-Installation
 
+Installation
 Clone the repository
 
-bashgit clone https://github.com/yourusername/traffic-sign-recognition.git
+git clone https://github.com/mo-ezz-eldin/traffic-sign-recognition.git
 cd traffic-sign-recognition
 
 Install dependencies
 
-bashpip install -r requirements.txt
+bash pip install -r requirements.txt
 
-Download the trained model
-
-The model file should be named traffic_sign_model.pth
-Place it in the project root directory
-Download from: [Model Download Link]
 
 
 Run the application
 
-bashstreamlit run streamlit_app.py
+bash streamlit run streamlit_app.py
 
 Open your browser
 
@@ -99,7 +95,7 @@ The model was trained using Google Colab with the following specifications:
 Dataset: German Traffic Sign Recognition Benchmark (GTSRB)
 Training Images: ~39,000 images
 Test Images: ~12,000 images
-Epochs: 20
+Epochs: 7
 Optimizer: Adam
 Learning Rate: 0.001
 Batch Size: 32
