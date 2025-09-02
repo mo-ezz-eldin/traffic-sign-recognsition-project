@@ -1,0 +1,41 @@
+"""
+Configuration settings for the traffic sign recognition app
+"""
+
+# Streamlit page configuration
+PAGE_CONFIG = {
+    "page_title": "AI Traffic Sign Recognition",
+    "page_icon": "🚦",
+    "layout": "wide",
+    "initial_sidebar_state": "collapsed"
+}
+
+# Model configuration
+MODEL_CONFIG = {
+    "model_path": "./traffic_sign_model.pth",
+    "num_classes": 43,
+    "input_size": 224,
+    "device": "cpu"  # Change to "cuda" if GPU available
+}
+
+# File upload configuration
+UPLOAD_CONFIG = {
+    "allowed_types": ['png', 'jpg', 'jpeg'],
+    "max_file_size": 10,  # MB
+    "help_text": "Supported formats: PNG, JPG, JPEG"
+}
+
+# UI configuration
+UI_CONFIG = {
+    "show_confidence_threshold": 0.5,
+    "top_predictions": 3,
+    "enable_animations": True
+}
+
+# Model performance metrics
+PERFORMANCE_METRICS = {
+    "accuracy": 99.91,
+    "precision": 99.89,
+    "recall": 99.91,
+    "f1_score": 99.90
+}
